@@ -15,6 +15,9 @@ from rvc.configs.config import Config
 
 config = Config()
 
+xdg_config_home = os.environ.get("XDG_CONFIG_HOME", os.path.expanduser("~/.config"))
+rvc_config_dir = os.path.join(xdg_config_home, "rvc-cli")
+
 
 @dataclasses.dataclass
 class F0Extractor:
@@ -78,7 +81,7 @@ class F0Extractor:
             f0 = f0.squeeze().cpu().numpy()
         elif method == "rmvpe":
             model_rmvpe = RMVPE0Predictor(
-                os.path.join("rvc", "models", "predictors", "rmvpe.pt"),
+                os.path.join(rvc_config_dir, "models", "predictors", "rmvpe.pt"),
                 is_half=config.is_half,
                 device=config.device,
                 # hop_length=80

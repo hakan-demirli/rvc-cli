@@ -22,10 +22,10 @@ logging.getLogger("faiss.loader").setLevel(logging.ERROR)
 logging.getLogger("transformers").setLevel(logging.ERROR)
 logging.getLogger("torch").setLevel(logging.ERROR)
 
-now_dir = os.getcwd()
-sys.path.append(now_dir)
+xdg_config_home = os.environ.get("XDG_CONFIG_HOME", os.path.expanduser("~/.config"))
+rvc_config_dir = os.path.join(xdg_config_home, "rvc-cli")
 
-base_path = os.path.join(now_dir, "rvc", "models", "formant", "stftpitchshift")
+base_path = os.path.join(rvc_config_dir, "rvc", "models", "formant", "stftpitchshift")
 stft = base_path + ".exe" if sys.platform == "win32" else base_path
 
 
@@ -93,7 +93,7 @@ def format_title(title):
 
 
 def load_embedding(embedder_model, custom_embedder=None):
-    embedder_root = os.path.join(now_dir, "rvc", "models", "embedders")
+    embedder_root = os.path.join(rvc_config_dir, "rvc", "models", "embedders")
     embedding_list = {
         "contentvec": os.path.join(embedder_root, "contentvec"),
         "chinese-hubert-base": os.path.join(embedder_root, "chinese_hubert_base"),

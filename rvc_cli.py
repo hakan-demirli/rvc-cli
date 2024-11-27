@@ -2,9 +2,10 @@ import argparse
 import os
 import sys
 from functools import lru_cache
+import pathlib
 
-now_dir = os.getcwd()
-sys.path.append(now_dir)
+script_dir = pathlib.Path(os.path.realpath(__file__)).parent.absolute()
+sys.path.append(str(script_dir))
 
 python = sys.executable
 

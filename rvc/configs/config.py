@@ -1,15 +1,19 @@
-import torch
 import json
 import os
+import pathlib
 
+import torch
+
+xdg_config_home = os.environ.get("XDG_CONFIG_HOME", os.path.expanduser("~/.config"))
+rvc_config_dir = os.path.join(xdg_config_home, "rvc-cli")
 
 version_config_paths = [
-    os.path.join("v1", "32000.json"),
-    os.path.join("v1", "40000.json"),
-    os.path.join("v1", "48000.json"),
-    os.path.join("v2", "48000.json"),
-    os.path.join("v2", "40000.json"),
-    os.path.join("v2", "32000.json"),
+    os.path.join(rvc_config_dir, "v1", "32000.json"),
+    os.path.join(rvc_config_dir, "v1", "40000.json"),
+    os.path.join(rvc_config_dir, "v1", "48000.json"),
+    os.path.join(rvc_config_dir, "v2", "48000.json"),
+    os.path.join(rvc_config_dir, "v2", "40000.json"),
+    os.path.join(rvc_config_dir, "v2", "32000.json"),
 ]
 
 
@@ -41,8 +45,7 @@ class Config:
     def load_config_json(self) -> dict:
         configs = {}
         for config_file in version_config_paths:
-            config_path = os.path.join("rvc", "configs", config_file)
-            with open(config_path, "r") as f:
+            with open(config_file, "r") as f:
                 configs[config_file] = json.load(f)
         return configs
 
@@ -60,26 +63,19 @@ class Config:
 
         fp16_run_value = precision == "fp16"
         preprocess_target_version = "3.7" if precision == "fp16" else "3.0"
-        preprocess_path = os.path.join(
-            os.path.dirname(__file__),
-            os.pardir,
-            "rvc",
-            "train",
-            "preprocess",
-            "preprocess.py",
-        )
 
+        # Iterate through all configuration paths and update them
         for config_path in version_config_paths:
-            full_config_path = os.path.join("rvc", "configs", config_path)
             try:
-                with open(full_config_path, "r") as f:
+                with open(config_path, "r") as f:
                     config = json.load(f)
                 config["train"]["fp16_run"] = fp16_run_value
-                with open(full_config_path, "w") as f:
+                with open(config_path, "w") as f:
                     json.dump(config, f, indent=4)
             except FileNotFoundError:
-                print(f"File not found: {full_config_path}")
+                print(f"File not found: {config_path}")
 
+        preprocess_path = os.path.join(rvc_config_dir, "train", "preprocess.py")
         if os.path.exists(preprocess_path):
             with open(preprocess_path, "r") as f:
                 preprocess_content = f.read()
@@ -95,15 +91,14 @@ class Config:
         if not version_config_paths:
             raise FileNotFoundError("No configuration paths provided.")
 
-        full_config_path = os.path.join("rvc", "configs", version_config_paths[0])
+        first_config_path = version_config_paths[0]
         try:
-            with open(full_config_path, "r") as f:
+            with open(first_config_path, "r") as f:
                 config = json.load(f)
             fp16_run_value = config["train"].get("fp16_run", False)
-            precision = "fp16" if fp16_run_value else "fp32"
-            return precision
+            return "fp16" if fp16_run_value else "fp32"
         except FileNotFoundError:
-            print(f"File not found: {full_config_path}")
+            print(f"File not found: {first_config_path}")
             return None
 
     def device_config(self) -> tuple:
