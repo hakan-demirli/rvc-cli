@@ -1,0 +1,33 @@
+# Ignore logs folder
+logs
+
+# Ignore compiled executables
+*.exe
+
+# Ignore model files
+*.pt
+*.onnx
+*.pth
+*.index
+*.bin
+*.ckpt
+*.txt
+*.wav
+*.patch
+
+# Ignore Python bytecode files
+*.pyc
+
+# Ignore environment and virtual environment directories
+env/
+venv/
+.direnv/
+
+# Ignore cached files
+.cache/
+docs/.next
+node_modules
+
+# Ignore specific project directories
+/tracks/
+/lyrics/
